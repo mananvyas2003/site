@@ -1,0 +1,270 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────
+   palette — pulled from an indian wedding invitation, because the
+   hero literally says weds. (PRD §7)
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  --color-paper: #fbf6ec;
+  --color-ink: #221a16;
+  --color-marigold: #e8a317;
+  --color-sindoor: #b23a2e;
+  --color-manno: #2e5e4e;
+  --color-momo: #9b3b66;
+  --color-haze: #d9cfbe;
+
+  --color-paper-deep: #f4ecdc;
+  --color-ink-soft: #6b5c52;
+
+  --font-display: var(--font-instrument-serif), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SF Mono", Menlo, monospace;
+  --font-deva: var(--font-yatra-one), var(--font-instrument-serif), serif;
+
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  color-scheme: light;
+  --grain-opacity: 0.035;
+}
+
+* {
+  border-color: var(--color-haze);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-y: none;
+}
+
+/* paper grain — the whole page sits on card stock */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background: var(--color-marigold);
+  color: var(--color-ink);
+}
+
+/* ── type ─────────────────────────────────────────────────── */
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 0.94;
+  text-transform: lowercase;
+}
+
+.display em {
+  font-style: italic;
+  color: var(--color-sindoor);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: lowercase;
+  color: var(--color-ink-soft);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.deva {
+  font-family: var(--font-deva);
+  font-weight: 400;
+}
+
+/* ── scroll reveal (PRD §7 motion: 400ms, small y-offset only) ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 400ms var(--ease-out-soft),
+    transform 400ms var(--ease-out-soft);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── photo cards: 2° hover tilt, maximum ─────────────────── */
+.tilt {
+  transition:
+    transform 320ms var(--ease-out-soft),
+    box-shadow 320ms var(--ease-out-soft);
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  .tilt:hover {
+    transform: rotate(-1.4deg) scale(1.02);
+    box-shadow: 0 18px 40px -18px rgb(34 26 22 / 0.35);
+  }
+}
+
+/* ── the drawn thread line ────────────────────────────────── */
+.thread-line {
+  stroke-dasharray: var(--dash-len, 1000);
+  stroke-dashoffset: calc(var(--dash-len, 1000) * (1 - var(--draw, 0)));
+}
+
+/* ── the locked note ──────────────────────────────────────── */
+.sealed-text {
+  filter: blur(7px);
+  opacity: 0.5;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ── utility ──────────────────────────────────────────────── */
+.hairline {
+  border-top: 1px solid var(--color-haze);
+}
+
+.card {
+  background: var(--color-paper-deep);
+  border: 1px solid var(--color-haze);
+}
+
+input,
+textarea,
+select,
+button {
+  font: inherit;
+  color: inherit;
+}
+
+textarea {
+  field-sizing: content;
+}
+
+.field {
+  width: 100%;
+  background: var(--color-paper);
+  border: 1px solid var(--color-haze);
+  border-radius: 2px;
+  padding: 0.7rem 0.85rem;
+  outline: none;
+  transition: border-color 160ms ease;
+}
+
+.field:focus {
+  border-color: var(--color-marigold);
+  box-shadow: 0 0 0 3px rgb(232 163 23 / 0.16);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 2px;
+  padding: 0.7rem 1.15rem;
+  font-size: 0.9rem;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    opacity 160ms ease;
+}
+
+.btn-primary {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.btn-primary:hover {
+  background: var(--color-sindoor);
+}
+
+.btn-ghost {
+  border: 1px solid var(--color-haze);
+}
+
+.btn-ghost:hover {
+  border-color: var(--color-ink);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── print (PRD P2 — /print/[year], A5) ───────────────────── */
+@page {
+  size: A5;
+  margin: 14mm 12mm;
+}
+
+@media print {
+  body::before,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    font-size: 10.5pt;
+  }
+  .page-break {
+    break-after: page;
+  }
+  .avoid-break {
+    break-inside: avoid;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+}
+
+/* ── reduced motion, respected everywhere ─────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+  .tilt:hover {
+    transform: none;
+  }
+}
