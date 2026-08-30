@@ -195,7 +195,10 @@ export async function getFirsts(): Promise<FirstRow[]> {
     async (db) => {
       const rows = await db.execute(
         sql`select f.*, m.slug as memory_slug, m.title as memory_title,
-                   (select x.thumb_key from media x where x.memory_id = m.id order by x.sort_order limit 1) as thumb_key
+                   coalesce(
+                     f.thumb_key,
+                     (select x.thumb_key from media x where x.memory_id = m.id order by x.sort_order limit 1)
+                   ) as thumb_key
             from firsts f left join memories m on m.id = f.memory_id
             order by f.sort_order asc, f.happened_on asc nulls last`,
       );

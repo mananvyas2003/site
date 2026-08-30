@@ -93,7 +93,13 @@ the site. Bucket → **Settings** → **CORS Policy** → paste:
 ```json
 [
   {
-    "AllowedOrigins": ["http://localhost:3000", "https://YOUR-DOMAIN.com"],
+    "AllowedOrigins": [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://localhost:3002",
+      "http://localhost:3003",
+      "https://YOUR-DOMAIN.com"
+    ],
     "AllowedMethods": ["PUT", "GET", "HEAD"],
     "AllowedHeaders": ["*"],
     "ExposeHeaders": ["ETag"],
@@ -102,8 +108,10 @@ the site. Bucket → **Settings** → **CORS Policy** → paste:
 ]
 ```
 
-Come back and add the real domain once you have one. **Uploads fail silently
-without this** — it's the single most common thing to forget.
+Come back and add the real domain once you have one. **Uploads used to fail when
+the dev server picked a port other than 3000** — the app now uploads through
+`/api/upload/put` instead, so CORS is optional for local dev. Still configure it
+before deploying: direct browser uploads are faster on mobile data.
 
 ---
 
@@ -188,23 +196,26 @@ about this: put 20 real memories in before you have opinions about the design.
 
 ---
 
-## 5. Deploy (10 min)
+## 5. Deploy
 
-Vercel Hobby, free, personal use.
+**→ [DEPLOY.md](./DEPLOY.md)** — full Vercel guide (env vars, CORS, migrations, cron).
 
-1. Put this folder on GitHub as a **private** repo.
-2. <https://vercel.com> → sign in with GitHub → **Add New → Project** → import it.
-3. Before deploying, open **Environment Variables** and paste in every line of
-   your `.env.local` — including `MANNO_PASSWORD_HASH`, `MOMO_PASSWORD_HASH`
-   and `AUTH_SECRET` — except set:
+Quick version:
+
+1. Push to GitHub (private repo).
+2. [vercel.com/new](https://vercel.com/new) → import the repo.
+3. Paste every line from `.env.local` into **Environment Variables**, but set:
    ```
    AUTH_URL=https://your-project.vercel.app
    ```
-4. Deploy.
-5. Go back and add the real URL to **two** places, or login and uploads will
-   break:
-   - R2 → CORS `AllowedOrigins`
-   - Vercel → `AUTH_URL`
+4. Before first deploy, run locally:
+   ```bash
+   npm run migrate-all
+   npm run db:seed
+   npm run check-deploy
+   npm run check-conn
+   ```
+5. Deploy. Then add the live URL to **R2 → CORS `AllowedOrigins`** — uploads go browser → R2 directly and need this.
 
 > When pasting a hash into Vercel's env UI, paste it exactly. It looks like
 > `scrypt:<hex>:<hex>` — no spaces, no line break, no surrounding quotes.

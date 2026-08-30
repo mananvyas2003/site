@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import AccountChip from "./AccountChip";
+import InboxBell from "./InboxBell";
 import type { Handle } from "@/lib/people";
 
 const NAV = [
   { href: "/", label: "us" },
+  { href: "/you", label: "your turn", signedInOnly: true },
   { href: "/#thread", label: "the thread" },
   { href: "/firsts", label: "firsts" },
   { href: "/letters", label: "sealed" },
@@ -18,6 +20,7 @@ export default function Chrome({
   handle,
   accent,
   unlocked = false,
+  unreadInbox = 0,
 }: {
   children: React.ReactNode;
   signedIn: boolean;
@@ -25,6 +28,7 @@ export default function Chrome({
   accent: string | null;
   /** running on localhost with no password set yet */
   unlocked?: boolean;
+  unreadInbox?: number;
 }) {
   const pathname = usePathname();
   const bare = pathname === "/signin" || pathname.startsWith("/print/");
@@ -40,7 +44,7 @@ export default function Chrome({
           </Link>
 
           <nav className="hidden items-center gap-1 sm:flex">
-            {NAV.map((item, i) => (
+            {NAV.filter((item) => !("signedInOnly" in item && item.signedInOnly) || signedIn).map((item, i) => (
               <span key={item.href} className="flex items-center">
                 {i > 0 && <span className="px-1 text-haze">·</span>}
                 <Link
@@ -58,6 +62,7 @@ export default function Chrome({
             <Link href="/search" aria-label="search" className="eyebrow hover:text-ink">
               search
             </Link>
+            {(signedIn || unlocked) && <InboxBell unread={unreadInbox} />}
             {signedIn && handle && <AccountChip handle={handle} accent={accent ?? "#221A16"} />}
             {!signedIn && (
               <Link href="/signin" className="btn btn-primary px-3 py-1.5 text-[0.6875rem]">

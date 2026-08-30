@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { prepareImage, uploadTo } from "@/lib/media-client";
+import { prepareImage, uploadRendition } from "@/lib/media-client";
 
 type Props = {
   memoryId: string;
@@ -75,11 +75,11 @@ export default function MemoryActions(props: Props) {
             body: JSON.stringify({ memoryId: props.memoryId, kind: "photo" }),
           })
         ).json();
-        if (!signed.webUrl) throw new Error(signed.error ?? "no upload url");
+        if (!signed.webKey) throw new Error(signed.error ?? "no upload url");
 
         await Promise.all([
-          uploadTo(signed.webUrl, item.web, "image/webp"),
-          uploadTo(signed.thumbUrl, item.thumb, "image/webp"),
+          uploadRendition(signed.webKey, item.web, "image/webp", signed.webUrl),
+          uploadRendition(signed.thumbKey, item.thumb, "image/webp", signed.thumbUrl),
         ]);
 
         await fetch("/api/media", {

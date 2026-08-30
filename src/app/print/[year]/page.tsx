@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Photo from "@/components/Photo";
 import PrintButton from "@/components/PrintButton";
+import SiteTitle from "@/components/SiteTitle";
 import { requirePage } from "@/lib/guard";
 import { prettyRange } from "@/lib/dates";
 import { getCounters, getMemoryMedia, getMemoryNotes, getThreadForYear, getUsers } from "@/lib/queries";
@@ -43,7 +44,7 @@ export default async function PrintYear({ params }: { params: Promise<{ year: st
         <div>
           <p className="eyebrow">{year}</p>
           <h1 className="display mt-4 text-[3.2rem] leading-[0.9]">
-            manno <em>weds</em> momo
+            <SiteTitle />
           </h1>
           <p className="mt-4 text-sm text-ink-soft">{COPY.heroSub}</p>
         </div>

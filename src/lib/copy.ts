@@ -7,10 +7,12 @@
  *
  * ► The lines marked WRITE-YOUR-OWN are starting points. Replace them.
  */
+export const SITE_TITLE = "manno & momo";
+
 export const COPY = {
-  heroEyebrow: "save the date — date to be confirmed",
-  heroSub: "paperwork pending. everything else already happened.",
-  heroCaption: "the day the college made it official. we took a bit longer.",
+  heroEyebrow: "just the two of us",
+  heroSub: "photos, dates, and our version of every day — before the camera roll swallows it.",
+  heroCaption: "silver jubilee tower, vellore. the day college made it official.",
 
   countEyebrow: "the count",
   // WRITE-YOUR-OWN — the PRD suggests replacing folio's "because phones break"

@@ -13,6 +13,8 @@ const Body = z.object({
   happenedOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullish(),
   memoryId: z.string().uuid().nullish(),
   note: z.string().trim().max(1000).nullish(),
+  thumbKey: z.string().trim().max(500).nullish(),
+  webKey: z.string().trim().max(500).nullish(),
   sortOrder: z.number().int().default(0),
 });
 
@@ -32,11 +34,21 @@ export async function POST(req: NextRequest) {
     happenedOn: values.happenedOn ?? null,
     memoryId: values.memoryId ?? null,
     note: values.note ?? null,
+    thumbKey: values.thumbKey ?? undefined,
+    webKey: values.webKey ?? undefined,
     sortOrder: values.sortOrder,
   };
 
   if (id) {
-    await db.update(firsts).set(payload).where(eq(firsts.id, id));
+    await db.update(firsts).set({
+      label: payload.label,
+      happenedOn: payload.happenedOn,
+      memoryId: payload.memoryId,
+      note: payload.note,
+      sortOrder: payload.sortOrder,
+      ...(values.thumbKey !== undefined ? { thumbKey: values.thumbKey } : {}),
+      ...(values.webKey !== undefined ? { webKey: values.webKey } : {}),
+    }).where(eq(firsts.id, id));
     return NextResponse.json({ ok: true, id });
   }
 

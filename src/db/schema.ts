@@ -99,6 +99,8 @@ export const firsts = pgTable("firsts", {
   happenedOn: date("happened_on"),
   memoryId: uuid("memory_id").references(() => memories.id),
   note: text("note"),
+  thumbKey: text("thumb_key"),
+  webKey: text("web_key"),
   sortOrder: integer("sort_order").default(0),
 });
 
@@ -118,6 +120,38 @@ export const counters = pgTable("counters", {
   startDate: date("start_date").notNull(),
 });
 
+export const pushSubscriptions = pgTable(
+  "push_subscriptions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    endpoint: text("endpoint").notNull(),
+    p256dh: text("p256dh").notNull(),
+    auth: text("auth").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  },
+  (t) => [unique("push_subscriptions_endpoint_uniq").on(t.endpoint)],
+);
+
+/** Private notes between the two of you — only the recipient sees them in their inbox. */
+export const inboxMessages = pgTable(
+  "inbox_messages",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    authorId: uuid("author_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    recipientId: uuid("recipient_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    kind: text("kind").notNull(), // love | journal | ping
+    title: text("title"),
+    body: text("body").notNull(),
+    readAt: timestamp("read_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  },
+  (t) => [
+    index("inbox_messages_recipient_idx").on(t.recipientId, t.readAt),
+    index("inbox_messages_author_idx").on(t.authorId),
+  ],
+);
+
 export type User = typeof users.$inferSelect;
 export type Memory = typeof memories.$inferSelect;
 export type Media = typeof media.$inferSelect;
@@ -125,3 +159,6 @@ export type Note = typeof notes.$inferSelect;
 export type Letter = typeof letters.$inferSelect;
 export type First = typeof firsts.$inferSelect;
 export type Counter = typeof counters.$inferSelect;
+export type PushSubscription = typeof pushSubscriptions.$inferSelect;
+export type InboxMessage = typeof inboxMessages.$inferSelect;
+export type InboxKind = "love" | "journal" | "ping";

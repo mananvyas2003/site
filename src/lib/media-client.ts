@@ -144,3 +144,54 @@ export async function uploadTo(url: string, blob: Blob, contentType: string) {
   const res = await fetch(url, { method: "PUT", body: blob, headers: { "Content-Type": contentType } });
   if (!res.ok) throw new Error(`upload failed (${res.status})`);
 }
+
+/** Presigned PUT for a single allowed key. */
+export async function presignUpload(key: string, contentType: string): Promise<string> {
+  const res = await fetch("/api/upload/sign-key", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ key, contentType }),
+  });
+  const data = (await res.json().catch(() => ({}))) as { uploadUrl?: string; error?: string };
+  if (!res.ok || !data.uploadUrl) throw new Error(data.error ?? `presign failed (${res.status})`);
+  return data.uploadUrl;
+}
+
+/**
+ * Upload a rendition. Prefers a presigned URL (browser → R2, required on Vercel —
+ * serverless functions cap request bodies at 4.5 MB). Falls back to the app
+ * proxy only on localhost when CORS isn't configured yet.
+ */
+export async function uploadRendition(
+  key: string,
+  blob: Blob,
+  contentType: string,
+  presignedUrl?: string | null,
+) {
+  if (presignedUrl) {
+    await uploadTo(presignedUrl, blob, contentType);
+    return;
+  }
+
+  const onLocalhost =
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+
+  if (onLocalhost) {
+    await uploadBlob(key, blob, contentType);
+    return;
+  }
+
+  const url = await presignUpload(key, contentType);
+  await uploadTo(url, blob, contentType);
+}
+
+/** Upload through the app server — localhost fallback when R2 CORS isn't set up. */
+export async function uploadBlob(key: string, blob: Blob, contentType: string) {
+  const form = new FormData();
+  form.append("key", key);
+  form.append("file", blob, key.split("/").pop() ?? "upload");
+  const res = await fetch("/api/upload/put", { method: "POST", body: form });
+  const data = (await res.json().catch(() => ({}))) as { error?: string };
+  if (!res.ok) throw new Error(data.error ?? `upload failed (${res.status})`);
+}

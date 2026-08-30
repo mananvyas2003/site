@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, GetObjectCommand, HeadObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 export const r2Configured = () =>
@@ -51,6 +51,26 @@ export async function presignPut(key: string, contentType: string, expiresIn = 6
   });
 }
 
+export async function putObject(key: string, body: Buffer | Uint8Array | Blob, contentType: string) {
+  const client = r2();
+  if (!client) throw new Error("R2 is not configured");
+  await client.send(
+    new PutObjectCommand({
+      Bucket: BUCKET(),
+      Key: key,
+      Body: body,
+      ContentType: contentType,
+    }),
+  );
+}
+
+const UPLOAD_KEY =
+  /^(?:thumb|web|voice)\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.(?:webp|webm)$|^site\/hero\.webp$|^firsts\/[0-9a-f-]{36}\/(?:thumb|web)\.webp$/;
+
+export function isUploadKey(key: string): boolean {
+  return UPLOAD_KEY.test(key) && !key.includes("..");
+}
+
 export async function getObject(key: string) {
   const client = r2();
   if (!client) return null;
@@ -58,6 +78,17 @@ export async function getObject(key: string) {
     return await client.send(new GetObjectCommand({ Bucket: BUCKET(), Key: key }));
   } catch {
     return null;
+  }
+}
+
+export async function objectExists(key: string): Promise<boolean> {
+  const client = r2();
+  if (!client) return false;
+  try {
+    await client.send(new HeadObjectCommand({ Bucket: BUCKET(), Key: key }));
+    return true;
+  } catch {
+    return false;
   }
 }
 

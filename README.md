@@ -7,6 +7,8 @@ Not a product. No sign-up, no third user, no landing page for strangers.
 **→ [SETUP.md](./SETUP.md).** Neon, R2 and the counter dates are connected and
 verified. The one step left is `npm run set-password`.
 
+**→ [DEPLOY.md](./DEPLOY.md)** when you're ready for Vercel.
+
 ---
 
 ## The one metric
@@ -42,6 +44,8 @@ exactly two people in.
 | `npm run check` | logic checks + type-check |
 | `npm run set-password` | set or change either password |
 | `npm run check-conn` | prove Neon and R2 actually answer |
+| `npm run check-deploy` | env checklist before Vercel |
+| `npm run migrate-all` | apply all SQL migrations to Neon |
 
 `npm run check` runs both check scripts plus a type-check:
 

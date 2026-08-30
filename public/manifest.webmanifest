@@ -1,5 +1,5 @@
 {
-  "name": "manno weds momo",
+  "name": "manno & momo",
   "short_name": "m&m",
   "description": "a private, two-person memory archive",
   "start_url": "/",
@@ -14,6 +14,8 @@
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ],
   "shortcuts": [
+    { "name": "your inbox", "url": "/inbox" },
+    { "name": "your turn", "url": "/you" },
     { "name": "add a memory", "url": "/new" },
     { "name": "the thread", "url": "/#thread" }
   ],

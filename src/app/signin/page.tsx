@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import SiteTitle from "@/components/SiteTitle";
 import SignInForm from "@/components/SignInForm";
 import { auth } from "@/lib/auth";
 import { authConfigured, configuredHandles, emailFor, isHandle } from "@/lib/people";
@@ -16,7 +17,7 @@ export default async function SignIn() {
     <main className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
       <p className="eyebrow">two people</p>
       <h1 className="display mt-4 text-[clamp(2.5rem,10vw,5rem)]">
-        manno <em>weds</em> momo
+        <SiteTitle />
       </h1>
       <p className="mt-4 max-w-sm text-ink-soft">
         pick who you are, type your password. your email is already wired in — there&apos;s no sign-up,
@@ -44,7 +45,6 @@ export default async function SignIn() {
         </div>
       )}
 
-      <p className="mono mt-14 text-[0.625rem] text-ink-soft">made in indore, by hand, for two people.</p>
     </main>
   );
 }

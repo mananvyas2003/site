@@ -25,14 +25,15 @@ export default function Counters({ counters, className = "" }: { counters: Count
   }
 
   return (
-    <div className={`flex flex-wrap items-baseline gap-x-6 gap-y-2 ${className}`}>
-      {counters.map((c, i) => (
-        <span key={c.key} className="flex items-baseline gap-2">
-          {i > 0 && <span className="mr-4 hidden text-haze sm:inline">·</span>}
-          <span className="eyebrow">{c.label}</span>
-          <span className="mono text-sm">day {formatCount(daysSince(c.startDate))}</span>
-        </span>
+    <dl className={`grid grid-cols-3 gap-x-4 gap-y-1 sm:gap-x-8 ${className}`}>
+      {counters.map((c) => (
+        <div key={c.key} className="min-w-0">
+          <dt className="eyebrow leading-snug">{c.label}</dt>
+          <dd className="mono mt-0.5 text-sm whitespace-nowrap">
+            day {formatCount(daysSince(c.startDate))}
+          </dd>
+        </div>
       ))}
-    </div>
+    </dl>
   );
 }

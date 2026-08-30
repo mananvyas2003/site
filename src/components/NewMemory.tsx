@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { inferCoords, inferDate, inferUntil, prepareImage, uploadTo, type Prepared } from "@/lib/media-client";
+import { inferCoords, inferDate, inferUntil, prepareImage, uploadRendition, type Prepared } from "@/lib/media-client";
 import { takeSharedFiles } from "@/lib/share-inbox";
 import { istToday, prettyDate } from "@/lib/dates";
 import VoiceRecorder from "./VoiceRecorder";
@@ -149,11 +149,11 @@ export default function NewMemory() {
             body: JSON.stringify({ memoryId: memory.id, kind: "photo" }),
           })
         ).json();
-        if (!signed.webUrl) throw new Error(signed.error ?? "could not get an upload url");
+        if (!signed.webKey) throw new Error(signed.error ?? "could not get an upload url");
 
         await Promise.all([
-          uploadTo(signed.webUrl, item.web, "image/webp"),
-          uploadTo(signed.thumbUrl, item.thumb, "image/webp"),
+          uploadRendition(signed.webKey, item.web, "image/webp", signed.webUrl),
+          uploadRendition(signed.thumbKey, item.thumb, "image/webp", signed.thumbUrl),
         ]);
 
         await fetch("/api/media", {
@@ -186,8 +186,8 @@ export default function NewMemory() {
             body: JSON.stringify({ memoryId: memory.id, kind: "voice" }),
           })
         ).json();
-        if (signed.voiceUrl) {
-          await uploadTo(signed.voiceUrl, voice.blob, "audio/webm");
+        if (signed.voiceKey) {
+          await uploadRendition(signed.voiceKey, voice.blob, "audio/webm", signed.voiceUrl);
           await fetch("/api/media", {
             method: "POST",
             headers: { "Content-Type": "application/json" },

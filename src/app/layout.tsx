@@ -7,6 +7,8 @@ import ServiceWorker from "@/components/ServiceWorker";
 import { auth } from "@/lib/auth";
 import Chrome from "@/components/Chrome";
 import { unlockedForSetup } from "@/lib/people";
+import { getUnreadInboxCount } from "@/lib/inbox";
+import { COPY, SITE_TITLE } from "@/lib/copy";
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
@@ -32,13 +34,13 @@ const yatraOne = Yatra_One({
 });
 
 export const metadata: Metadata = {
-  title: "manno weds momo",
-  description: "paperwork pending. everything else already happened.",
+  title: SITE_TITLE,
+  description: COPY.heroSub,
   manifest: "/manifest.webmanifest",
   robots: { index: false, follow: false, nocache: true },
   // no OG image with real photos, ever (PRD §10)
-  openGraph: { title: "manno weds momo", images: [] },
-  appleWebApp: { capable: true, title: "manno weds momo", statusBarStyle: "default" },
+  openGraph: { title: SITE_TITLE, images: [] },
+  appleWebApp: { capable: true, title: SITE_TITLE, statusBarStyle: "default" },
   icons: { icon: "/icon.svg", apple: "/icon.svg" },
 };
 
@@ -52,6 +54,8 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   const signedIn = Boolean(session?.user?.id || session?.user?.email);
+  const unreadInbox =
+    signedIn && session?.user?.id ? await getUnreadInboxCount(session.user.id) : 0;
 
   return (
     <html
@@ -67,6 +71,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           handle={session?.user?.handle ?? null}
           accent={session?.user?.accent ?? null}
           unlocked={unlockedForSetup()}
+          unreadInbox={unreadInbox}
         >
           {children}
         </Chrome>

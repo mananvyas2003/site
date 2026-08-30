@@ -3,7 +3,7 @@ import Counters from "@/components/Counters";
 import Thread from "@/components/Thread";
 import Photo from "@/components/Photo";
 import OnThisDay from "@/components/OnThisDay";
-import HeroImage from "@/components/HeroImage";
+import HeroSection from "@/components/HeroSection";
 import BothSidesShowcase from "@/components/BothSidesShowcase";
 import { auth } from "@/lib/auth";
 import { requirePage } from "@/lib/guard";
@@ -39,48 +39,60 @@ export default async function Home() {
   return (
     <main>
       {/* ── 1. hero ─────────────────────────────────────────── */}
-      <section className="relative">
-        <HeroImage />
-        <div className="relative mx-auto max-w-6xl px-5 pb-14 pt-16 sm:pb-20 sm:pt-24">
-          <p className="eyebrow reveal">{COPY.heroEyebrow}</p>
-          <h1 className="display reveal mt-4 text-[clamp(3rem,13vw,9rem)]" style={{ ["--reveal-delay" as string]: "60ms" }}>
-            manno <em>weds</em> momo
-          </h1>
-          <p
-            className="reveal mt-5 max-w-md text-lg text-ink-soft"
-            style={{ ["--reveal-delay" as string]: "120ms" }}
-          >
-            {COPY.heroSub}
-          </p>
-          <div className="reveal mt-9" style={{ ["--reveal-delay" as string]: "180ms" }}>
-            <Counters counters={counters} />
+      <section className="relative overflow-hidden bg-paper">
+        <div className="mx-auto grid max-w-6xl lg:grid-cols-2 lg:min-h-[min(88vh,820px)]">
+          {/* photo — top on mobile, right on desktop; faces stay centred */}
+          <div className="relative order-1 min-h-[58vw] sm:min-h-[440px] lg:order-2 lg:min-h-full">
+            <HeroSection />
           </div>
-          <p className="mono reveal mt-3 text-[0.6875rem] text-ink-soft">{COPY.heroCaption}</p>
 
-          {!signedIn ? (
-            <div className="reveal mt-8 flex flex-wrap items-center gap-3" style={{ ["--reveal-delay" as string]: "240ms" }}>
-              <Link href="/signin" className="btn btn-primary">
-                sign in
-              </Link>
-              {unlocked && (
-                <p className="mono text-[0.6875rem] text-ink-soft">
-                  no password set yet — you&apos;re browsing unlocked
-                </p>
-              )}
+          <div className="relative order-2 flex flex-col justify-center px-5 py-12 sm:py-16 lg:order-1 lg:py-16 lg:pr-10">
+            <p className="eyebrow reveal">{COPY.heroEyebrow}</p>
+            <h1 className="display reveal mt-4 text-[clamp(2.75rem,11vw,6.5rem)] leading-[0.95]" style={{ ["--reveal-delay" as string]: "60ms" }}>
+              manno <span className="italic text-sindoor">&</span> momo
+            </h1>
+            <p
+              className="reveal mt-5 max-w-md text-lg text-ink-soft"
+              style={{ ["--reveal-delay" as string]: "120ms" }}
+            >
+              {COPY.heroSub}
+            </p>
+            <div className="reveal mt-9" style={{ ["--reveal-delay" as string]: "180ms" }}>
+              <Counters counters={counters} />
             </div>
-          ) : (
-            <div className="reveal mt-8 flex flex-wrap items-center gap-3" style={{ ["--reveal-delay" as string]: "240ms" }}>
-              <Link href="/new" className="btn btn-primary">
-                add a memory
-              </Link>
-              <Link href={`/picks?who=${me.handle}`} className="btn btn-ghost">
-                {me.handle}&apos;s picks
-              </Link>
-              <span className="mono text-[0.6875rem]" style={{ color: me.accent }}>
-                signed in as {me.handle}
-              </span>
-            </div>
-          )}
+            <p className="mono reveal mt-3 text-[0.6875rem] text-ink-soft">{COPY.heroCaption}</p>
+
+            {!signedIn ? (
+              <div className="reveal mt-8 flex flex-wrap items-center gap-3" style={{ ["--reveal-delay" as string]: "240ms" }}>
+                <Link href="/signin" className="btn btn-primary">
+                  sign in
+                </Link>
+                {unlocked && (
+                  <p className="mono text-[0.6875rem] text-ink-soft">
+                    no password set yet — you&apos;re browsing unlocked
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="reveal mt-8 flex flex-wrap items-center gap-3" style={{ ["--reveal-delay" as string]: "240ms" }}>
+                <Link href="/new" className="btn btn-primary">
+                  add a memory
+                </Link>
+                <Link href="/you" className="btn btn-ghost">
+                  your turn
+                </Link>
+                <Link href="/inbox" className="btn btn-ghost">
+                  inbox
+                </Link>
+                <Link href={`/picks?who=${me.handle}`} className="btn btn-ghost">
+                  {me.handle}&apos;s picks
+                </Link>
+                <span className="mono text-[0.6875rem]" style={{ color: me.accent }}>
+                  signed in as {me.handle}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
@@ -191,23 +203,11 @@ export default async function Home() {
         </Link>
       </Section>
 
-      {/* ── 8. a note from us ───────────────────────────────── */}
-      <Section eyebrow="a note from us" bordered>
-        <div className="grid gap-10 sm:grid-cols-2">
-          <NoteFromUs handle="manno" accent="#2E5E4E" body={COPY.noteFromManno} />
-          <NoteFromUs handle="momo" accent="#9B3B66" body={COPY.noteFromMomo} />
-        </div>
-      </Section>
-
-      {/* ── 9. footer ───────────────────────────────────────── */}
+      {/* ── 8. footer ───────────────────────────────────────── */}
       <footer className="hairline mt-8">
         <div className="mx-auto max-w-6xl px-5 py-14">
           <Counters counters={counters} />
-          <div className="mt-10 flex flex-wrap items-end justify-between gap-6">
-            <div>
-              <p className="eyebrow">{COPY.footer}</p>
-              <p className="display mt-3 text-[1.75rem]">{COPY.footerSignoff}</p>
-            </div>
+          <div className="mt-10 flex flex-wrap items-end justify-end gap-6">
             <div className="flex flex-col items-start gap-1 sm:items-end">
               <span className="deva text-2xl text-sindoor">मन्नो</span>
               <Link href="/map" className="eyebrow underline underline-offset-4">
@@ -256,17 +256,6 @@ function Stat({ label, value }: { label: string; value: string }) {
     <div>
       <dt className="eyebrow">{label}</dt>
       <dd className="mono mt-1.5 text-3xl">{value}</dd>
-    </div>
-  );
-}
-
-function NoteFromUs({ handle, accent, body }: { handle: string; accent: string; body: string }) {
-  return (
-    <div className="reveal">
-      <span className="mono text-[0.6875rem] lowercase tracking-[0.16em]" style={{ color: accent }}>
-        {handle}
-      </span>
-      <p className="mt-3 max-w-prose leading-relaxed">{body}</p>
     </div>
   );
 }
